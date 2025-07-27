@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline Manager</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                    </svg>
+                    <span>Pipeline AI</span>
+                </div>
+            </div>
+            
+            <div class="sidebar-content">
+                <button class="new-pipeline-btn" id="newPipelineBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    New Pipeline
+                </button>
+                
+                <div class="pipeline-history">
+                    <div class="section-title">Recent Pipelines</div>
+                    <div id="sidebarPipelines"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="chat-container">
+                <!-- Welcome Screen -->
+                <div id="welcomeScreen" class="welcome-screen">
+                    <div class="welcome-content">
+                        <h1>Create Synthetic Data Pipelines</h1>
+                        <p>Generate AI-powered data streams with simple descriptions</p>
+                        
+                        <div class="example-prompts">
+                            <div class="example-prompt" data-name="user_events" data-description="Generate user activity events with timestamps, user IDs, and action types">
+                                <div class="example-title">User Events Stream</div>
+                                <div class="example-desc">Generate user activity events with timestamps, user IDs, and action types</div>
+                            </div>
+                            <div class="example-prompt" data-name="sensor_data" data-description="Create IoT sensor readings with temperature, humidity, and device information">
+                                <div class="example-title">IoT Sensor Data</div>
+                                <div class="example-desc"  style="white-space: pre-line;">
+                                    Create IoT sensor readings based on a sample JSON data
+{
+&nbsp;&nbsp;"deviceId": "TEMP_HUM_001",
+&nbsp;&nbsp;"deviceName": "Living Room Sensor",
+&nbsp;&nbsp;"location": "Living Room",
+&nbsp;&nbsp;"timestamp": "2025-07-07T08:00:00Z",
+&nbsp;&nbsp;"temperature": 22.5,
+&nbsp;&nbsp;"humidity": 45.2,
+&nbsp;&nbsp;"batteryLevel": 87
+}
+
+                                </div>
+                            </div>
+                            <div class="example-prompt" data-name="financial_transactions" data-description="Generate financial transaction records with amounts, currencies, and merchant data">
+                                <div class="example-title">Financial Transactions</div>
+                                <div class="example-desc" style="white-space: pre-line;" >Generate financial transaction records with following MySQL DDL statement: 
+CREATE TABLE financial_transactions ( 
+&nbsp;&nbsp;transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+&nbsp;&nbsp;amount DECIMAL(15,2) NOT NULL,
+&nbsp;&nbsp;currency VARCHAR(3) NOT NULL,
+&nbsp;&nbsp;merchant_name VARCHAR(255) NOT NULL,
+&nbsp;&nbsp;merchant_category VARCHAR(100),
+&nbsp;&nbsp;transaction_date DATETIME NOT NULL,
+&nbsp;&nbsp;transaction_type ENUM('debit', 'credit') NOT NULL,
+&nbsp;&nbsp;description TEXT
+);
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Form -->
+                <div id="createForm" class="create-form" style="display: none;">
+                    <div class="form-container">
+                        <div class="form-header">
+                            <h2>Create New Pipeline</h2>
+                            <button class="close-btn" id="closeFormBtn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <form id="pipelineForm">                            
+                            <div class="input-group">
+                                <textarea id="pipelineDescription" name="question" placeholder="Describe the synthetic data you want to generate..." required rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn-secondary" id="cancelFormBtn">Cancel</button>
+                                <button type="submit" class="btn-primary">
+                                    <span class="btn-text">Create Pipeline</span>
+                                    <div class="btn-spinner" style="display: none;">
+                                        <div class="spinner"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Pipeline Details -->
+                <div id="pipelineDetails" class="pipeline-details" style="display: none;">
+                    <div class="details-header">
+                        <button class="back-btn" id="backBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 12H5M12 19L5 12L12 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Back
+                        </button>
+                        <div class="pipeline-title">
+                            <h2 id="detailsPipelineName"></h2>
+                            <span id="detailsPipelineId" class="pipeline-id-badge"></span>
+                        </div>
+                        <button class="delete-pipeline-btn" id="deletePipelineBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 6H5H21M8 6V4C8 3.44772 8.44772 3 9 3H15C15.5523 3 16 3.44772 16 4V6M19 6V20C19 20.5523 18.4477 21 18 21H6C5.44772 21 5 20.5523 5 20V6H19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="details-content">
+                        <div class="detail-section">
+                            <h3>Description</h3>
+                            <p id="detailsDescription"></p>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>Pipeline Statistics</h3>
+                            <div class="stats-container">
+                                <div class="stat-item">
+                                    <div class="stat-label">Records Generated</div>
+                                    <div class="stat-value" id="detailsWriteCount">0</div>
+                                    <div class="stat-refresh-indicator">
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                                            <path d="M1 4V10H7M23 20V14H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M3.51 15A9 9 0 0 0 18.36 18.36L23 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                        <span>Auto-refreshing every 3s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>Components</h3>
+                            <div id="detailsComponents"></div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>DDL Statements</h3>
+                            <div id="detailsDDL"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toast Notifications -->
+            <div id="toastContainer" class="toast-container"></div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

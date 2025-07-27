@@ -1,0 +1,62 @@
+services:
+
+  timeplus:
+    image: timeplus/timeplus-enterprise:2.9.0-rc.5
+    #platform: linux/amd64
+    ports:
+      - 8000:8000
+      - 8463:8463
+      - 8123:8123
+      - 3218:3218
+    environment:
+      - ENABLE_DATA_PREALLOCATE=false
+    volumes:
+      - timeplus_data:/timeplus/data/
+
+  generator:
+    image: timeplus/synthetic:5f7a9cd
+    container_name: random_stream_generator
+    ports:
+      - "5001:5001"
+    environment:
+      TIMEPLUS_HOST: timeplus
+      TIMEPLUS_USER: ${TIMEPLUS_USER:-"proton"}
+      TIMEPLUS_PASSWORD: ${TIMEPLUS_PASSWORD:-"timeplus@t+"}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_MODEL: ${OPENAI_MODEL}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL:-"https://api.openai.com/v1"}
+      PORT: 5001
+      KAFKA_BROKERS: kafka:9092
+    depends_on:
+      - timeplus
+
+  kafka:
+    image: redpandadata/redpanda:v23.3.4
+    container_name: kafka
+    command:
+      - redpanda start
+      - --smp 1
+      - --memory 1G
+      - --reserve-memory 0M
+      - --overprovisioned
+      - --node-id 0
+      - --check=false
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:19092
+      - --advertise-kafka-addr PLAINTEXT://kafka:9092,OUTSIDE://localhost:19092
+      - --schema-registry-addr 0.0.0.0:8081
+      - --pandaproxy-addr 0.0.0.0:8082
+      - --advertise-pandaproxy-addr localhost:8082
+    ports:
+      - "19092:19092"
+      - "9644:9644"  # Admin API
+      - "8081:8081"  # Schema Registry
+    volumes:
+      - redpanda-data:/var/lib/redpanda
+    environment:
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+
+volumes:
+  timeplus_data:
+    driver: local
+  redpanda-data:
+    driver: local
