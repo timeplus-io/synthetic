@@ -1,4 +1,4 @@
-export OPENAI_API_KEY=AIzaSyCIyPoET8mTv1BR-Ydm67eXvLW8k5jtuMw
+export OPENAI_API_KEY=xxx-xxx
 export OPENAI_MODEL=gemini-2.5-flash
 export OPENAI_BASE_URL=https://generativelanguage.googleapis.com/v1beta/openai/
 
