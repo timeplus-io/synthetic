@@ -70,6 +70,12 @@ CREATE RANDOM STREAM test_generate(
   location string default generate('city', rand())
 )
 
+
+WARNING: The `generate()` function is not supported in Timeplus currently.
+
+Do NOT use `generate('type', rand())`. Use alternatives like `array_element()` or `random_printable_ascii()` instead.
+
+
 ### Essential Patterns
 1. Conditional Logic (Use multi_if, NOT CASE WHEN)
 sqlfield_name type DEFAULT multi_if(
