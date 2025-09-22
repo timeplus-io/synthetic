@@ -52,8 +52,8 @@ random_in_type('ipv4') - Random IPv4 address
 random_in_type('ipv6') - Random IPv6 address
 
 
-### Specific Data Types with generate() Function
-For realistic data generation, you can use generate('type_name', rand()) for these types:
+### Specific data Types
+For Specific data types list below, you can use generate('type_name', rand()) for the experession.
 
 Person: name, first_name, last_name, email, phone_number
 Address: address, street_address, city, state, country, postcode
@@ -64,85 +64,62 @@ Finance: credit_card_number, iban, currency_code
 Automotive: license_plate
 Color: color_name, hex_color, rgb_color
 
-Example usage:
-```sql
-CREATE RANDOM STREAM customer_stream (
-  name string DEFAULT generate('name', rand()),
-  email string DEFAULT generate('email', rand()),
-  city string DEFAULT generate('city', rand()),
-  company string DEFAULT generate('company', rand()),
-  job_title string DEFAULT generate('job', rand())
-) SETTINGS eps = 10;
-```
+for example:
+CREATE RANDOM STREAM test_generate(
+  name string default generate('name', rand()),
+  location string default generate('city', rand())
+)
 
 ### Essential Patterns
 1. Conditional Logic (Use multi_if, NOT CASE WHEN)
-```sql
-field_name type DEFAULT multi_if(
+sqlfield_name type DEFAULT multi_if(
     condition1, value1,
     condition2, value2,
     default_value
 )
-```
 
 2. Weighted Distributions
-```sql
-customer_type DEFAULT multi_if(
+sqlcustomer_type DEFAULT multi_if(
     (rand() % 100) <= 60, 'regular',    -- 60%
     (rand() % 100) <= 80, 'premium',    -- 20% 
     'vip'                               -- 20%
 )
-```
 
-3. Array Selection (Fallback when generate() not available)
-```sql
-field DEFAULT array_element(['option1', 'option2', 'option3'], (rand() % 3) + 1)
-```
+3. Array Selection
+sqlfield DEFAULT array_element(['option1', 'option2', 'option3'], (rand() % 3) + 1)
 
 4. String Composition
-```sql
-email DEFAULT concat(
-    generate('first_name', rand()), 
-    '.', 
-    generate('last_name', rand()),
-    '@',
-    generate('domain_name', rand())
+sqlemail DEFAULT concat(
+    random_printable_ascii(8), 
+    '@', 
+    array_element(['gmail.com', 'yahoo.com'], (rand() % 2) + 1)
 )
-```
 
 5. Time-based Patterns
-```sql
-traffic_volume DEFAULT multi_if(
+sqltraffic_volume DEFAULT multi_if(
     to_hour(timestamp) >= 7 AND to_hour(timestamp) <= 9, rand_poisson(300),  -- Rush hour
     to_hour(timestamp) >= 22 OR to_hour(timestamp) <= 6, rand_poisson(50),   -- Night
     rand_poisson(150)  -- Regular
 )
-```
 
 6. Geographic Coordinates
-```sql
-latitude DEFAULT round(rand_uniform(40.0, 45.0), 6),
+sqllatitude DEFAULT round(rand_uniform(40.0, 45.0), 6),
 longitude DEFAULT round(rand_uniform(-125.0, -70.0), 6)
-```
 
 7. Related Field Dependencies
-```sql
-price DEFAULT round(exp(rand_normal(3.5, 1.2)), 2),
+sqlprice DEFAULT round(exp(rand_normal(3.5, 1.2)), 2),
 revenue DEFAULT multi_if(
     event_type = 'purchase', price,
     0
 )
-```
 
 ### Best Practices
 DO:
-✅ Use generate() function for realistic data when available
-✅ Use constant parameters in random functions
-✅ Use multi_if instead of CASE WHEN
-✅ Apply realistic statistical distributions
-✅ Create field relationships for realism
-✅ Use appropriate eps settings (1-1000 typical)
-✅ Include timestamp fields with now64()
-✅ Use enum8 for categorical data
-✅ Generate UUIDs for unique identifiers
-✅ Combine generate() with other functions for complex patterns
+Use constant parameters in random functions
+Use multi_if instead of CASE WHEN
+Apply realistic statistical distributions
+Create field relationships for realism
+Use appropriate eps settings (1-1000 typical)
+Include timestamp fields with now64()
+Use enum8 for categorical data
+Generate UUIDs for unique identifiers
