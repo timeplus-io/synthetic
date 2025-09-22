@@ -158,14 +158,14 @@ CREATE RANDOM STREAM customer_data (
 
 ### Best Practices (Safe Mode)
 DO:
-✅ Use array_element() for predefined realistic options
-✅ Use random_printable_ascii() for random text generation
-✅ Use constant parameters in random functions
-✅ Use multi_if instead of CASE WHEN
-✅ Apply realistic statistical distributions
-✅ Create field relationships for realism
-✅ Use appropriate eps settings (1-1000 typical)
-✅ Include timestamp fields with now64()
-✅ Use enum8 for categorical data
-✅ Generate UUIDs for unique identifiers
-✅ Build comprehensive arrays of realistic values
+- Use array_element() for predefined realistic options
+- Use random_printable_ascii() for random text generation
+- Use constant parameters in random functions
+- Use multi_if instead of CASE WHEN
+- Apply realistic statistical distributions
+- Create field relationships for realism
+- Use appropriate eps settings (1-1000 typical)
+- Include timestamp fields with now64()
+- Use enum8 for categorical data
+- Generate UUIDs for unique identifiers
+- Build comprehensive arrays of realistic values
