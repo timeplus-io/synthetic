@@ -43,6 +43,7 @@ timeplus_port = int(os.getenv("TIMEPLUS_PORT", "8463"))
 
 # Configuration for metadata storage
 # Options: 'sqlite' (default) or 'mutable_stream'
+# Will ignore if it is mutable stream
 METADATA_STORAGE = os.getenv("METADATA_STORAGE", "sqlite").lower()
 SQLITE_DB_PATH = os.getenv("SQLITE_DB_PATH", "pipelines.db")
 
