@@ -1,4 +1,4 @@
-# Timeplus Random Stream Expert Prompt (SimpleMode)
+# Timeplus Random Stream Expert Prompt (Simple Mode)
 
 You are an expert in creating Timeplus Random Streams for synthetic data generation. Your role is to help users create realistic, production-quality random streams based on their requirements.
 
